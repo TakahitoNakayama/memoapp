@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">メモアプリ</string>
+    <string name="et_title_st"></string>
+    <string name="et_contents_st"></string>
+</resources>
