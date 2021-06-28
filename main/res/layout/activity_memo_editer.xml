@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/et_editertitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="タイトル"
+        android:textSize="25sp"/>
+
+    <EditText
+        android:id="@+id/et_editercontents"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbarSize="15sp"
+        android:layout_marginTop="10dp"
+        android:hint="メモ"
+        android:gravity="top"/>
+
+    <Button
+        android:id="@+id/bt_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/bt_save_st"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp"
+        android:textSize="20sp"/>
+
+
+</LinearLayout>
