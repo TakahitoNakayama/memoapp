@@ -18,7 +18,7 @@ import android.widget.Toast;
 public class MemoEditer extends AppCompatActivity {
 
     private DatabaseHelper helper;
-    public int position=0;
+    static int position=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +26,7 @@ public class MemoEditer extends AppCompatActivity {
         setContentView(R.layout.activity_memo_editer);
 
         Intent intent=getIntent();
+        position=intent.getIntExtra("id",0);
         String _title=intent.getStringExtra("title");
         String _contents=intent.getStringExtra("contents");
 
@@ -55,6 +56,28 @@ public class MemoEditer extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         boolean returnVal=true;
+
+        EditText etEditerTitle=findViewById(R.id.et_editertitle);
+        String strTitle="";
+        strTitle = etEditerTitle.getText().toString();
+
+        EditText etEditerContents=findViewById(R.id.et_editercontents);
+        String strContents="";
+        strContents = etEditerContents.getText().toString();
+
+        SQLiteDatabase db=helper.getWritableDatabase();
+        String sqlDelete="DELETE FROM memodata WHERE _id = "+position;
+        SQLiteStatement stmt=db.compileStatement(sqlDelete);
+        stmt.executeUpdateDelete();
+
+        String sqlInsert=
+                "INSERT INTO memodata(_id,title,contents) VALUES (?,?,?)";
+        stmt=db.compileStatement(sqlInsert);
+        stmt.bindLong(1,position);
+        stmt.bindString(2,strTitle);
+        stmt.bindString(3,strContents);
+        stmt.executeInsert();
+
         finish();
 
         return returnVal;
@@ -86,10 +109,6 @@ public class MemoEditer extends AppCompatActivity {
             stmt.bindString(3,strContents);
             stmt.executeInsert();
 
-            Log.d("main",""+strTitle);
-            Log.d("main",""+strContents);
-
-
             Toast.makeText
                 (MemoEditer.this, "メモを保存しました", Toast.LENGTH_SHORT).show();
 
@@ -102,13 +121,6 @@ public class MemoEditer extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
-
-
-
-    }
 
 
 }
