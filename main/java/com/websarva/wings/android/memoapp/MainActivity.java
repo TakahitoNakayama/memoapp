@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.nio.file.Paths.get;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,8 +49,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ListView lvMemo=findViewById(R.id.lv_memo);
+
         memoList=new ArrayList<Map<String,String>>();
-        memoCreate();
+
+        helper=new DatabaseHelper(MainActivity.this);
+        SQLiteDatabase db=helper.getWritableDatabase();
+        String sqlAll="SELECT * FROM memodata";
+        Cursor cursor=db.rawQuery(sqlAll,null);
+        while (cursor.moveToNext()){
+            int idxTitle=cursor.getColumnIndex("title");
+            strTitle=cursor.getString(idxTitle);
+            int idxContents=cursor.getColumnIndex("contents");
+            strContents=cursor.getString(idxContents);
+
+            memoMap=new HashMap<>();
+            memoMap.put("title",strTitle);
+            memoMap.put("contents",strContents);
+            memoList.add(memoMap);
+        }
+
+        SimpleAdapter adapter=new SimpleAdapter
+                (MainActivity.this,memoList, android.R.layout.simple_list_item_2,from,to);
+        lvMemo.setAdapter(adapter);
+
+
+        registerForContextMenu(lvMemo);
+
+
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -103,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
         public void onItemClick
                 (AdapterView<?> parent, View view, int position, long id) {
             Intent intent=new Intent(MainActivity.this,MemoEditer.class);
+            Map<String,String> map=memoList.get(position);
+            strTitle=map.get("title");
+            strContents=map.get("contents");
             intent.putExtra("id",position);
             intent.putExtra("title",strTitle);
             intent.putExtra("contents",strContents);
@@ -135,6 +168,43 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
 
         return returnVal;
+    }
+
+    @Override
+    public void onCreateContextMenu
+            (ContextMenu menu,View view,ContextMenu.ContextMenuInfo menuInfo){
+        super.onCreateContextMenu(menu,view,menuInfo);
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.menu_context_menu_list,menu);
+
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        boolean returnVal=true;
+        AdapterView.AdapterContextMenuInfo info=
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int listPosition=info.position;
+
+        helper=new DatabaseHelper(MainActivity.this);
+        SQLiteDatabase db=helper.getWritableDatabase();
+        String sqlDelete="DELETE FROM memodata WHERE _id = "+listPosition;
+        SQLiteStatement stmt=db.compileStatement(sqlDelete);
+        stmt.executeUpdateDelete();
+
+        memoList.remove(listPosition);
+        ListView lvMemo=findViewById(R.id.lv_memo);
+        SimpleAdapter adapter=new SimpleAdapter
+                (MainActivity.this,memoList, android.R.layout.simple_list_item_2,from,to);
+        lvMemo.setAdapter(adapter);
+
+
+        return returnVal;
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
 }

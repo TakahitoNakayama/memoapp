@@ -3,4 +3,5 @@
     <string name="et_title_st"></string>
     <string name="et_contents_st"></string>
     <string name="bt_save_st">保存</string>
+    <string name="menu_context_dele">削除</string>
 </resources>
