@@ -32,13 +32,14 @@ import static java.nio.file.Paths.get;
 
 public class MainActivity extends AppCompatActivity {
 
-    String[] from={"title","contents"};
+    String[] from={"title","contentsshort"};
     int[] to={android.R.id.text1,android.R.id.text2};
 
     private DatabaseHelper helper;
 
     private String strTitle="タイトル";
     private String strContents="メモ";
+    private String strContentsShort="メモ";
 
     List<Map<String,String>> memoList;
     Map<String,String> memoMap;
@@ -62,10 +63,12 @@ public class MainActivity extends AppCompatActivity {
             strTitle=cursor.getString(idxTitle);
             int idxContents=cursor.getColumnIndex("contents");
             strContents=cursor.getString(idxContents);
+            shortContentsCreate();
 
             memoMap=new HashMap<>();
             memoMap.put("title",strTitle);
             memoMap.put("contents",strContents);
+            memoMap.put("contentsshort",strContentsShort);
             memoList.add(memoMap);
         }
 
@@ -78,6 +81,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void shortContentsCreate(){
+        if(strContents.length()<20){
+            strContentsShort=strContents.substring(0,strContents.length());
+        }
+        else{
+            strContentsShort=strContents.substring(0,20);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -96,10 +108,13 @@ public class MainActivity extends AppCompatActivity {
             strContents=cursor.getString(idxContents);
         }
         ListView lvMemo=findViewById(R.id.lv_memo);
+        shortContentsCreate();
 
         Map<String,String> map=memoList.get(MemoEditer.position);
         String v=map.replace("title",strTitle);
         v=map.replace("contents",strContents);
+        v=map.replace("contentsshort",strContentsShort);
+
         SimpleAdapter adapter=new SimpleAdapter
                 (MainActivity.this,memoList, android.R.layout.simple_list_item_2,from,to);
         lvMemo.setAdapter(adapter);
